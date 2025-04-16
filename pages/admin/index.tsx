@@ -20,8 +20,9 @@ export default function AdminDashboard() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [metadataFields, setMetadataFields] = useState<MetadataField[]>([]);
   const [selectedFolder, setSelectedFolder] = useState('');
-  const [selectedFields, setSelectedFields] = useState<Record<string, { include: boolean; required: boolean }>>({});
-
+  const [selectedFields, setSelectedFields] = useState<
+    Record<string, { include: boolean; required: boolean }>
+  >({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +47,50 @@ export default function AdminDashboard() {
     } else {
       setFolders(data.folders || []);
       setMetadataFields(data.metadataFields || []);
+    }
+  };
+
+  const handleGenerateUploader = async () => {
+    if (!selectedFolder) {
+      alert('Please select a folder.');
+      return;
+    }
+
+    const selectedFieldList = Object.entries(selectedFields)
+      .filter(([, value]) => value.include)
+      .map(([external_id, value]) => ({
+        external_id,
+        required: value.required,
+      }));
+
+    const payload = {
+      cloudName,
+      apiKey,
+      apiSecret,
+      folder: selectedFolder,
+      fields: selectedFieldList,
+    };
+
+    try {
+      const res = await fetch('/api/uploader-configs/new', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.id) {
+        throw new Error(data.error || 'Failed to create uploader config');
+      }
+
+      const link = `${window.location.origin}/upload/${data.id}`;
+      console.log('✅ Uploader Config Created:', data);
+      alert(`Uploader created! Share this link:\n\n${link}`);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Uploader config failed:', error.message);
+      alert(`Something went wrong: ${error.message}`);
     }
   };
 
@@ -85,7 +130,11 @@ export default function AdminDashboard() {
         </Button>
       </Form>
 
-      {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+      {error && (
+        <Alert variant="danger" className="mt-3">
+          {error}
+        </Alert>
+      )}
 
       {folders.length > 0 && (
         <div className="mt-4">
@@ -97,7 +146,9 @@ export default function AdminDashboard() {
           >
             <option value="">-- Select a folder --</option>
             {folders.map((f) => (
-              <option key={f.path} value={f.path}>{f.name}</option>
+              <option key={f.path} value={f.path}>
+                {f.name}
+              </option>
             ))}
           </Form.Select>
         </div>
@@ -146,25 +197,9 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <Button
-        className="mt-4"
-        onClick={() => {
-          const config = {
-            folder: selectedFolder,
-            fields: Object.entries(selectedFields)
-              .filter(([, value]) => value.include)
-              .map(([key, value]) => ({
-                external_id: key,
-                required: value.required,
-              })),
-          };
-          console.log('Uploader Config:', config);
-          alert('Uploader config logged to console!');
-        }}
-      >
+      <Button className="mt-4" onClick={handleGenerateUploader}>
         Generate Uploader Config
       </Button>
-
     </Container>
   );
 }

@@ -40,9 +40,11 @@ export default async function handler(
   try {
     const cloudinary = configureCloudinary(cloud_name, api_key, api_secret);
 
+    // Fetch root folders
     const folderRes = await cloudinary.api.root_folders();
-    const metadataFields = await cloudinary.api.metadata_fields();
 
+    // ✅ Fetch metadata fields correctly
+    const metadataFields = await cloudinary.api.metadata_fields();
     return res.status(200).json({
       success: true,
       folders: folderRes.folders,

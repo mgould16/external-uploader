@@ -152,7 +152,7 @@ export default function AdminDashboard() {
           const config = {
             folder: selectedFolder,
             fields: Object.entries(selectedFields)
-              .filter(([_, value]) => value.include)
+              .filter(([key, value]) => value.include)
               .map(([key, value]) => ({
                 external_id: key,
                 required: value.required,

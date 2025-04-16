@@ -33,7 +33,6 @@ export default function UploaderPage() {
       } catch (err) {
         const error = err as Error;
         setError(error.message);
-      }
       } finally {
         setLoading(false);
       }
@@ -42,7 +41,7 @@ export default function UploaderPage() {
     fetchConfig();
   }, [token]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
 

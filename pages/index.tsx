@@ -15,9 +15,9 @@ export default function Home() {
         <h1 className="mb-4">🚀 Cloudinary DAM External Uploader!</h1>
         <p>This app allows DAM admins to create secure upload interfaces for external contributors.</p>
         <div className="d-flex gap-2 mt-4">
-          <Button variant="primary" href="/admin">
-            Go to Admin Setup
-          </Button>
+        <Button variant="primary" onClick={() => alert('No admin yet')}>
+          Admin coming soon
+        </Button>
           <Button variant="outline-secondary" href="/upload/test123">
             Simulate External Upload
           </Button>

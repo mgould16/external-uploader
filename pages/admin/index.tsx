@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   return (
     <Container className="py-5">
-      <h1>Cloudinary Admin Setup!</h1>
+      <h1>Cloudinary Admin Setup!!!</h1>
       <p>Enter your Cloudinary credentials to begin configuration.</p>
 
       <Form onSubmit={handleSubmit}>

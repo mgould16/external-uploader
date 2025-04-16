@@ -30,8 +30,10 @@ export default function UploaderPage() {
         if (!res.ok) throw new Error('Invalid or expired uploader link');
         const data = await res.json();
         setConfig(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        const error = err as Error;
+        setError(error.message);
+      }
       } finally {
         setLoading(false);
       }

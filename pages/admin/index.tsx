@@ -1,13 +1,24 @@
 import { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 
+interface Folder {
+  name: string;
+  path: string;
+}
+
+interface MetadataField {
+  external_id: string;
+  label: string;
+  type: string;
+}
+
 export default function AdminDashboard() {
   const [cloudName, setCloudName] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [apiSecret, setApiSecret] = useState('');
   const [error, setError] = useState('');
-  const [folders, setFolders] = useState<any[]>([]);
-  const [metadataFields, setMetadataFields] = useState<any[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [metadataFields, setMetadataFields] = useState<MetadataField[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +54,19 @@ export default function AdminDashboard() {
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Cloud Name</Form.Label>
-          <Form.Control value={cloudName} onChange={(e) => setCloudName(e.target.value)} />
+          <Form.Control
+            value={cloudName}
+            onChange={(e) => setCloudName(e.target.value)}
+            className="form-control"
+          />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>API Key</Form.Label>
-          <Form.Control value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
+          <Form.Control
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="form-control"
+          />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>API Secret</Form.Label>
@@ -55,6 +74,7 @@ export default function AdminDashboard() {
             type="password"
             value={apiSecret}
             onChange={(e) => setApiSecret(e.target.value)}
+            className="form-control"
           />
         </Form.Group>
         <Button type="submit" variant="primary">
@@ -68,7 +88,7 @@ export default function AdminDashboard() {
         <div className="mt-4">
           <h5>Available Folders</h5>
           <ul>
-            {folders.map((f: any) => (
+            {folders.map((f) => (
               <li key={f.path}>{f.name}</li>
             ))}
           </ul>
@@ -79,7 +99,7 @@ export default function AdminDashboard() {
         <div className="mt-5">
           <h5>Structured Metadata Fields</h5>
           <ul>
-            {metadataFields.map((field: any) => (
+            {metadataFields.map((field) => (
               <li key={field.external_id}>
                 <strong>{field.label}</strong> ({field.type}) – <code>{field.external_id}</code>
               </li>

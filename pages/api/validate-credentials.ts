@@ -43,7 +43,7 @@ export default async function handler(
     // Fetch root folders
     const folderRes = await cloudinary.api.root_folders();
 
-    // ✅ Fetch metadata fields correctly
+    // @ts-expect-error: metadata_fields is not typed in cloudinary SDK but is valid
     const metadataFields = await cloudinary.api.metadata_fields();
     return res.status(200).json({
       success: true,

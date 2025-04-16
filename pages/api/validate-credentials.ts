@@ -1,11 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { configureCloudinary } from '@/lib/cloudinary';
-import type { RootFoldersResponse, MetadataFieldGetResponse } from 'cloudinary';
+
+type Folder = {
+  name: string;
+  path: string;
+};
+
+type MetadataField = {
+  external_id: string;
+  label: string;
+  type: string;
+};
 
 type SuccessResponse = {
   success: true;
-  folders: RootFoldersResponse['folders'];
-  metadataFields: MetadataFieldGetResponse[];
+  folders: Folder[];
+  metadataFields: MetadataField[];
 };
 
 type ErrorResponse = {
@@ -30,15 +40,12 @@ export default async function handler(
   try {
     const cloudinary = configureCloudinary(cloud_name, api_key, api_secret);
 
-    // Fetch root folders
-    const { folders } = await cloudinary.api.root_folders();
-
-    // Fetch all structured metadata fields
+    const folderRes = await cloudinary.api.root_folders();
     const metadataFields = await cloudinary.api.metadata_fields();
 
     return res.status(200).json({
       success: true,
-      folders,
+      folders: folderRes.folders,
       metadataFields,
     });
   } catch (err) {

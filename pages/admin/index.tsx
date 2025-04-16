@@ -19,6 +19,9 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
   const [folders, setFolders] = useState<Folder[]>([]);
   const [metadataFields, setMetadataFields] = useState<MetadataField[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState('');
+  const [selectedFields, setSelectedFields] = useState<Record<string, { include: boolean; required: boolean }>>({});
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,27 +89,82 @@ export default function AdminDashboard() {
 
       {folders.length > 0 && (
         <div className="mt-4">
-          <h5>Available Folders</h5>
-          <ul>
+          <h5>Select Upload Folder</h5>
+          <Form.Select
+            value={selectedFolder}
+            onChange={(e) => setSelectedFolder(e.target.value)}
+            className="mb-3"
+          >
+            <option value="">-- Select a folder --</option>
             {folders.map((f) => (
-              <li key={f.path}>{f.name}</li>
+              <option key={f.path} value={f.path}>{f.name}</option>
             ))}
-          </ul>
+          </Form.Select>
         </div>
       )}
 
       {metadataFields.length > 0 && (
-        <div className="mt-5">
-          <h5>Structured Metadata Fields</h5>
-          <ul>
-            {metadataFields.map((field) => (
-              <li key={field.external_id}>
-                <strong>{field.label}</strong> ({field.type}) – <code>{field.external_id}</code>
-              </li>
-            ))}
-          </ul>
+        <div className="mt-4">
+          <h5>Select Structured Metadata Fields</h5>
+          {metadataFields.map((field) => (
+            <Form.Group key={field.external_id} className="mb-2">
+              <Form.Check
+                type="checkbox"
+                id={`include-${field.external_id}`}
+                label={`Include "${field.label}" (${field.type})`}
+                checked={!!selectedFields[field.external_id]?.include}
+                onChange={(e) => {
+                  setSelectedFields((prev) => ({
+                    ...prev,
+                    [field.external_id]: {
+                      ...prev[field.external_id],
+                      include: e.target.checked,
+                    },
+                  }));
+                }}
+              />
+              {selectedFields[field.external_id]?.include && (
+                <Form.Check
+                  type="checkbox"
+                  id={`required-${field.external_id}`}
+                  label="Required"
+                  checked={!!selectedFields[field.external_id]?.required}
+                  onChange={(e) => {
+                    setSelectedFields((prev) => ({
+                      ...prev,
+                      [field.external_id]: {
+                        ...prev[field.external_id],
+                        required: e.target.checked,
+                      },
+                    }));
+                  }}
+                  className="ms-4"
+                />
+              )}
+            </Form.Group>
+          ))}
         </div>
       )}
+
+      <Button
+        className="mt-4"
+        onClick={() => {
+          const config = {
+            folder: selectedFolder,
+            fields: Object.entries(selectedFields)
+              .filter(([_, value]) => value.include)
+              .map(([key, value]) => ({
+                external_id: key,
+                required: value.required,
+              })),
+          };
+          console.log('Uploader Config:', config);
+          alert('Uploader config logged to console!');
+        }}
+      >
+        Generate Uploader Config
+      </Button>
+
     </Container>
   );
 }
